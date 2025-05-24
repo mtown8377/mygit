@@ -11,3 +11,8 @@ RUN pipenv install ansible
 RUN pipenv install boto 
 RUN pipenv install boto3
 RUN pipenv install botocore
+RUN mkdir /monk
+RUN chmod 744 /monk
+COPY play.yml /monk
+COPY myrun.sh /monk
+WORKDIR /monk
