@@ -18,4 +18,5 @@ COPY play.yml /monk
 COPY myrun.sh /monk
 COPY ansible.cfg /monk
 COPY hosts.ini /monk
+COPY jump.yml /monk
 WORKDIR /monk
