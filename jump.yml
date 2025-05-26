@@ -10,8 +10,20 @@
       name: "*"
       state: latest
 
-  - name: Upgrade all packages
+  - name: Install Ansible, pip, vim, git
     ansible.builtin.dnf:
-      name: "*"
+      name:
+        - ansible-core
+        - pip
+        - vim
+        - git
       state: latest
 
+  - name: install pip, force upgrade
+    pip: 
+      name: pip
+      extra_args: --upgrade
+
+  - name: install pipenv
+    pip: 
+      name: pipenv
