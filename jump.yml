@@ -1,0 +1,17 @@
+---  
+
+- name: AWS EC2 Jump Box Config
+  hosts: jumpy
+  become: yes
+  tasks:
+
+  - name: Upgrade all packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+
+  - name: Upgrade all packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+
