@@ -1,0 +1,32 @@
+---  
+
+- name: AWS EC2 Jumpbox Config
+  hosts: jumpy
+  become: yes
+  tasks:
+
+  - name: Upgrade all packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+
+  - name: Install Ansible, pip, vim, git via dnf
+    ansible.builtin.dnf:
+      name:
+        - ansible-core
+        - pip
+        - vim
+        - git
+      state: latest
+
+  - name: install pip, force upgrade via pip
+    pip: 
+      name: pip
+      extra_args: --upgrade
+
+  - name: install pipenv via pip
+    pip: 
+      name: pipenv
+
+  - name: pipenv install stuff1 via shell
+    shell: /usr/local/bin/pipenv --python 3.12 install
