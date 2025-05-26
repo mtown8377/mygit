@@ -1,6 +1,6 @@
 ---  
 
-- name: AWS EC2 Jump Box Config
+- name: AWS EC2 Jumpbox Config
   hosts: jumpy
   become: yes
   tasks:

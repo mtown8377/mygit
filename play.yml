@@ -1,10 +1,10 @@
 ---  
 
-- name: AWS EC2 Instance Playbook
+- name: AWS EC2 Instances Playbook
   hosts: localhost
   vars:
     vpc_id: "vpc-052e7e8d67d7c6d71"
-    project_name: "5-21-25-100PM"
+    project_name: "5-26-25-100PM"
     instance_type: t2.micro
     vpc_subnet_id: subnet-01f13dddf0b37ce0c
     ami_id: ami-03a13a09a711d3871
@@ -53,7 +53,7 @@
   - name: Show sg
     ansible.builtin.debug: var=sg
 
-  - name: Create an EC2 Instance
+  - name: Create an EC2 Instance - Jumpbox
     amazon.aws.ec2_instance:
       state: present    # present | absent | restarted | running | stopped
       image_id: "{{ ami_id }}"
@@ -66,14 +66,40 @@
       network_interfaces:
         - assign_public_ip: yes     # requires vpc_subnet_id
       tags:
-        Name: "{{ project_name }}"
-    register: ec2
+        Name: "{{ project_name }}-Jumpbox"
+    register: ec2jumpbox
 
-  - name: Show ec2
-    ansible.builtin.debug: var=ec2
+  - name: Show ec2jumpbox
+    ansible.builtin.debug: var=ec2jumpbox
 
-  - name: Show SSH Commands for Instance
+  - name: Show SSH Commands for Instance - Jumpbox
     ansible.builtin.debug:
       msg: 
-      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2.instances[0].public_ip_address}}"
-      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2.instances[0].public_dns_name}}"
+      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2jumpbox.instances[0].public_ip_address}}"
+      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2jumpbox.instances[0].public_dns_name}}"
+
+
+  - name: Create an EC2 Instance - Router
+    amazon.aws.ec2_instance:
+      state: present    # present | absent | restarted | running | stopped
+      image_id: "{{ ami_id }}"
+      instance_type: "{{ instance_type | default('t2.micro') }}"
+      vpc_subnet_id: "{{ vpc_subnet_id }}"
+      security_group: "{{ sg.group_name }}"
+      key_name: "{{ project_name }}.public_key"   # SSH Key Name
+      count: 1
+      wait: yes   # wait for instance to reach desired state before returning
+      network_interfaces:
+        - assign_public_ip: yes     # requires vpc_subnet_id
+      tags:
+        Name: "{{ project_name }}-Router"
+    register: ec2router
+
+  - name: Show ec2router
+    ansible.builtin.debug: var=ec2router
+
+  - name: Show SSH Commands for Instance - Router
+    ansible.builtin.debug:
+      msg: 
+      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2router.instances[0].public_ip_address}}"
+      - "ssh -i ./{{ project_name }}.private_key.pem ec2-user@{{ ec2router.instances[0].public_dns_name}}"
